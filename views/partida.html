@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comenzar la Partida</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>El Pastor te observa...</h1>
+        <p>Ingresa tus credenciales para continuar:</p>
+        <form id="login-form">
+            <label for="username">Nombre de usuario:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="key">Clave inicial:</label>
+            <input type="text" id="key" name="key" required>
+
+            <button type="submit">Comenzar</button>
+        </form>
+        <!-- Mensaje de error o éxito -->
+        <p id="message" style="color: red; display: none;"></p>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form'); // Capturamos el formulario
+        const message = document.getElementById('message'); // Capturamos el elemento para los mensajes
+    
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evitar el envío tradicional del formulario
+            console.log('El formulario ha sido interceptado'); // Confirmación en la consola del navegador
+    
+            // Obtener los datos del formulario
+            const formData = new FormData(form); // Capturamos los datos del formulario
+            const data = Object.fromEntries(formData); // Convertimos a un objeto JSON            
+    
+            // Enviar los datos al servidor
+            const response = await fetch('/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data) // Enviamos los datos como JSON
+            });
+    
+            // Manejar la respuesta del servidor
+            const result = await response.json();
+            if (result.success) {
+                // Si las credenciales son correctas
+                message.style.color = 'green';
+                message.textContent = '¡Credenciales correctas! La partida comienza...';
+                message.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = '/game'; // Redirigir a la página del juego
+                }, 2000);
+            } else {
+                // Si las credenciales son incorrectas
+                message.style.color = 'red';
+                message.textContent = result.message; // Mostrar el mensaje del servidor
+                message.style.display = 'block';
+            }
+        });
+    </script>
+    
+</body>
+</html>
+
+
